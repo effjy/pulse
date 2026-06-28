@@ -1,6 +1,6 @@
 <div align="center">
 
-# PULSE
+<a href="https://github.com/effjy/pulse/"><img src="titles/pulse-title.svg" height="52" alt="Pulse"></a>
 
 **A unified, real-time monitor for the whole machine — written in C++ with a
 GTK4 interface and a Tokyo Night dark theme.**
