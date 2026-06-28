@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Pulse
+GenericName=System Monitor
+Comment=Real-time monitor for CPU, temperature, memory, disk and network
+Exec=pulse
+Icon=pulse
+Terminal=false
+Categories=System;Monitor;GTK;
+Keywords=system;monitor;cpu;temperature;load;ram;memory;disk;network;health;vitals;
+StartupNotify=true
+StartupWMClass=pulse
