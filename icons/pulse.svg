@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a2f45"/>
+      <stop offset="0.55" stop-color="#1a1b26"/>
+      <stop offset="1" stop-color="#14141d"/>
+    </linearGradient>
+    <linearGradient id="pulse" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0"   stop-color="#7dcfff"/>
+      <stop offset="0.5" stop-color="#7aa2f7"/>
+      <stop offset="1"   stop-color="#bb9af7"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-60%" width="180%" height="220%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <radialGradient id="vig" cx="0.5" cy="0.38" r="0.75">
+      <stop offset="0" stop-color="#7aa2f7" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#7aa2f7" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Tile -->
+  <rect x="14" y="14" width="228" height="228" rx="50" fill="url(#bg)"
+        stroke="#7aa2f7" stroke-opacity="0.30" stroke-width="2.5"/>
+  <rect x="14" y="14" width="228" height="228" rx="50" fill="url(#vig)"/>
+
+  <!-- Baseline grid -->
+  <g stroke="#7aa2f7" stroke-opacity="0.10" stroke-width="2">
+    <line x1="40" y1="128" x2="216" y2="128"/>
+    <line x1="40" y1="92"  x2="216" y2="92"/>
+    <line x1="40" y1="164" x2="216" y2="164"/>
+  </g>
+
+  <!-- Pulse / ECG waveform -->
+  <polyline
+    points="34,128 74,128 92,128 104,84 120,176 138,60 156,128 184,128 222,128"
+    fill="none" stroke="url(#pulse)" stroke-width="9"
+    stroke-linejoin="round" stroke-linecap="round" filter="url(#glow)"/>
+
+  <!-- Leading node -->
+  <circle cx="222" cy="128" r="8.5" fill="#bb9af7" filter="url(#glow)"/>
+  <circle cx="138" cy="60"  r="5"   fill="#7dcfff"/>
+</svg>
