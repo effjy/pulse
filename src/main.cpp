@@ -1138,20 +1138,44 @@ static void on_unit_toggle(GtkButton *btn, gpointer data) {
 // ---------------------------------------------------------------------------
 // System tray — close / minimize to tray, restore from it
 // ---------------------------------------------------------------------------
-// Raise and focus the window. When restored from the tray there's no GTK input
-// event behind the request, so on X11 the WM treats the raise as "focus
-// stealing"; stamping the surface's user-time with a fresh server timestamp
-// tells the WM this is a genuine user action.
-static void present_front(AppState *s) {
-    if (!s->window) return;
-    gtk_widget_set_visible(s->window, TRUE);
-    gtk_window_unminimize(GTK_WINDOW(s->window));
+// Raise, unminimize and focus the window. When restored from the tray there's
+// no GTK input event behind the request, so on X11 the WM treats the raise as
+// "focus stealing"; stamping the surface's user-time with a fresh server
+// timestamp tells the WM this is a genuine user action.
+static void raise_front(GtkWidget *window) {
+    gtk_window_unminimize(GTK_WINDOW(window));
 #ifdef GDK_WINDOWING_X11
-    GdkSurface *surf = gtk_native_get_surface(GTK_NATIVE(s->window));
+    GdkSurface *surf = gtk_native_get_surface(GTK_NATIVE(window));
     if (surf && GDK_IS_X11_SURFACE(surf))
         gdk_x11_surface_set_user_time(surf, gdk_x11_get_server_time(surf));
 #endif
-    gtk_window_present(GTK_WINDOW(s->window));
+    gtk_window_present(GTK_WINDOW(window));
+}
+
+// One-shot: when a window shown from the tray finishes mapping, raise it and
+// disconnect ourselves.
+static void on_map_raise(GtkWidget *window, gpointer) {
+    g_signal_handlers_disconnect_by_func(window, (gpointer)on_map_raise, nullptr);
+    raise_front(window);
+}
+
+// Bring the window to the front, whether it's already on screen or hidden in
+// the tray. The tray "minimize" path hides the window while it still carries
+// the MINIMIZED flag, so showing it again re-creates the surface *asynchronously*
+// — issuing unminimize/present right away (as we used to) lands before that
+// surface is mapped and the WM drops the request, leaving the window stuck.
+// So when the window isn't mapped yet we defer the raise to the "map" signal.
+static void present_front(AppState *s) {
+    if (!s->window) return;
+    if (gtk_widget_get_mapped(s->window)) {
+        raise_front(s->window);
+        return;
+    }
+    // Connect before showing so we never miss the map; guard against stacking
+    // duplicate handlers if Show is clicked repeatedly before the map lands.
+    g_signal_handlers_disconnect_by_func(s->window, (gpointer)on_map_raise, nullptr);
+    g_signal_connect(s->window, "map", G_CALLBACK(on_map_raise), nullptr);
+    gtk_widget_set_visible(s->window, TRUE);
 }
 
 static void tray_show_cb(void *user) { present_front(static_cast<AppState *>(user)); }
